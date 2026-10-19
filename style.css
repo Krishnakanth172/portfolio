@@ -5,6 +5,8 @@
 html {
     --color-accent: oklch(65% 0.18 200);
     accent-color: var(--color-accent);
+
+    color-scheme: light dark;
 }
 
 
@@ -36,13 +38,23 @@ img {
 ========================================================= */
 
 nav {
+    --border-color: oklch(50% 10% 200 / 40%);
+
     display: flex;
     flex-wrap: wrap;
-
     margin-bottom: 1em;
+    border-bottom: 1px solid var(--border-color);
+}
 
-    border-bottom:
-        1px solid oklch(80% 3% 200);
+.color-scheme {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 80%;
+}
+
+.color-scheme select {
+    margin-left: 0.25em;
 }
 
 nav a {
@@ -61,9 +73,7 @@ nav a {
 /* Current Page */
 
 nav a.current {
-    border-bottom:
-        0.4em solid oklch(80% 3% 200);
-
+    border-bottom: 0.4em solid var(--border-color);
     padding-bottom: 0.1em;
 }
 
@@ -82,9 +92,7 @@ nav a:hover {
    Contact Form
 ========================================================= */
 
-input,
-textarea,
-button {
+input, textarea, button, select {
     font: inherit;
 }
 
@@ -294,8 +302,8 @@ h6 {
 /* Resume Dates */
 
 .resume-page time {
-    color:
-        oklch(45% 3% 200);
+    color: inherit;
+    opacity: 0.65;
 }
 
 
