@@ -1,0 +1,74 @@
+[
+    {
+        "title": "Agentic AI Evaluation, Observability & Release-Gate Platform",
+        "year": 2026,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Built a multi-agent RAG evaluation platform for testing AI agents across hundreds of scenarios and evaluating grounding, tool use, recovery, and multi-step reasoning."
+    },
+    {
+        "title": "Real-Time Product Intelligence & Analytics Lakehouse",
+        "year": 2026,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Created a real-time data platform for ingesting, processing, analyzing, and forecasting product activity at scale."
+    },
+    {
+        "title": "Foundation Model Fine-Tuning & Production ML Platform",
+        "year": 2026,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Built an end-to-end workflow for adapting and deploying a large language model using efficient fine-tuning and production ML tooling."
+    },
+    {
+        "title": "Machine Learning Inference & Performance Regression Lab",
+        "year": 2025,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Designed a high-performance inference environment for serving and benchmarking machine-learning models."
+    },
+    {
+        "title": "Project 2: Deceptive Visualization",
+        "year": 2026,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Created two opposing visualizations from the same World Bank demographic dataset to explore how framing, aggregation, scale, and annotations influence interpretation."
+    },
+    {
+        "title": "DSC 209R Portfolio Website",
+        "year": 2026,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Built a responsive personal portfolio using HTML, CSS, modular JavaScript, dynamic navigation, theme persistence, JSON-driven project rendering, and GitHub API data."
+    },
+    {
+        "title": "Project Seven",
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Temporary project content retained for the portfolio project layout."
+    },
+    {
+        "title": "Project Eight",
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Temporary project content retained for the portfolio project layout."
+    },
+    {
+        "title": "Project Nine",
+        "year": 2024,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Temporary project content retained for the portfolio project layout."
+    },
+    {
+        "title": "Project Ten",
+        "year": 2023,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Temporary project content retained for the portfolio project layout."
+    },
+    {
+        "title": "Project Eleven",
+        "year": 2023,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Temporary project content retained for the portfolio project layout."
+    },
+    {
+        "title": "Project Twelve",
+        "year": 2023,
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Temporary project content retained for the portfolio project layout."
+    }
+]

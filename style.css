@@ -306,7 +306,28 @@ h6 {
     opacity: 0.65;
 }
 
+/* =========================================================
+   GitHub Profile Stats
+========================================================= */
 
+#profile-stats dl {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1em;
+    margin-block: 1em 2em;
+}
+
+#profile-stats dt {
+    grid-row: 1;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+#profile-stats dd {
+    grid-row: 2;
+    margin: 0;
+    font-size: 2em;
+}
 /* =========================================================
    Responsive Design
 ========================================================= */
@@ -369,5 +390,13 @@ h6 {
     form button {
         grid-column:
             1;
+    }
+    #profile-stats dl {
+    grid-template-columns: repeat(2, 1fr);
+    }
+
+    #profile-stats dt,
+    #profile-stats dd {
+    grid-row: auto;
     }
 }
