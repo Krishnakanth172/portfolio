@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Project 2: Persuasive or Deceptive Visualization?</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f3f4f6;
+            color: #222;
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        .assignment-label {
+            display: table;
+            margin: 0 auto 0.5rem;
+            padding: 0.25rem 0.7rem;
+            background: #626775;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        h1 {
+            max-width: 650px;
+            margin: 0 auto 1.5rem;
+            text-align: center;
+            font-size: clamp(2.7rem, 7vw, 5rem);
+            line-height: 0.95;
+        }
+
+        .author {
+            text-align: center;
+            font-size: 0.9rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .report {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        h2 {
+            margin-top: 0;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid #d5d8dd;
+        }
+
+        h3 {
+            margin-top: 2rem;
+        }
+
+        figure {
+            margin: 1rem 0 2rem;
+        }
+
+        figure img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: 1px solid #d5d8dd;
+        }
+
+        figcaption {
+            margin-top: 0;
+            padding: 0.6rem;
+            background: #eef0f2;
+            font-size: 0.9rem;
+        }
+
+        .rationale-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .decisions li {
+            margin-bottom: 1rem;
+        }
+
+        .score {
+            font-weight: bold;
+        }
+
+        .reflection p {
+            margin-bottom: 1rem;
+        }
+
+        .source-note {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        @media (max-width: 700px) {
+            main {
+                padding: 2rem 1rem;
+            }
+
+            .report {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main>
+
+    <div class="assignment-label">PROJECT 2</div>
+
+    <h1>
+        Persuasive<br>
+        or Deceptive<br>
+        Visualization?
+    </h1>
+
+    <p class="author">
+        Krishna Kanth Kodanganti — kkodanganti@ucsd.edu
+    </p>
+
+    <section class="report">
+
+        <h2>
+            Proposition: Population aging has become a major global demographic shift.
+        </h2>
+
+        <p>
+            <strong>Dataset:</strong> Both visualizations use the same World Bank
+            Human Development Indicators dataset and the same measure,
+            Population ages 65 and above (% of total population). The opposing
+            messages result from different transformations, aggregation choices,
+            comparison frames, and visual emphasis rather than different source data.
+        </p>
+
+        <p class="source-note">
+            Design-decision scores range from -2 (fully deceptive) to
+            +2 (fully earnest).
+        </p>
+
+        <!-- =====================================================
+             FOR THE PROPOSITION
+        ====================================================== -->
+
+        <h3>FOR the Proposition</h3>
+
+        <figure>
+            <img
+                src="supporting-aging.png"
+                alt="Line chart showing the indexed global population age 65 and older increasing from 100 in 1960 to about 187.5 in 2020."
+            >
+
+            <figcaption>
+                Figure 1: Indexing the global age-65+ population share to
+                1960 = 100 emphasizes an 87.5% relative increase between
+                1960 and 2020.
+            </figcaption>
+        </figure>
+
+        <p class="rationale-title">
+            Design Decisions and Rationale:
+        </p>
+
+        <ul class="decisions">
+
+            <li>
+                <span class="score">Relative-change framing — Score: -1.5.</span>
+                I transformed the age-65+ share from 4.97% in 1960 and
+                9.32% in 2020 into an index where 1960 equals 100. This
+                makes the 87.5% relative increase visually prominent and
+                strongly supports the claim that aging represents a major
+                demographic shift. I considered showing only the raw
+                percentage-point increase of 4.35 points, but that framing
+                made the change appear substantially smaller, so I selected
+                the indexed view for its greater persuasive impact.
+            </li>
+
+            <li>
+                <span class="score">Truncated vertical scale — Score: -2.</span>
+                The vertical axis begins near 90 rather than zero, which
+                increases the apparent steepness of the trend. This works
+                well for emphasizing change around the indexed baseline of
+                100, but it also visually exaggerates the magnitude of the
+                increase. I considered a zero-based axis, which would be
+                more conventional and earnest, but chose the restricted
+                scale because it makes year-to-year growth easier to see
+                and strengthens the supporting argument.
+            </li>
+
+            <li>
+                <span class="score">Global aggregation — Score: -1.</span>
+                Using the World aggregate produces a single smooth
+                trajectory and makes population aging appear to be a
+                unified global phenomenon. The advantage is a clear and
+                memorable trend, while the limitation is that substantial
+                cross-country variation disappears. I considered displaying
+                many country-level trajectories, but those made the message
+                less focused, so I retained the World aggregate to emphasize
+                the overall shift.
+            </li>
+
+            <li>
+                <span class="score">Annotations and source transparency — Score: +1.5.</span>
+                I explicitly display the original 1960 and 2020 percentages,
+                the +87.5% calculation, year labels, and the World Bank
+                source. These annotations let readers verify what the
+                indexed transformation represents and partially counteract
+                the more deceptive framing choices. I considered displaying
+                only the index values for a cleaner and more dramatic chart,
+                but retained the underlying percentages because the additional
+                transparency makes the visualization more defensible.
+            </li>
+
+        </ul>
+
+        <p class="source-note">
+            Source: World Bank Human Development Indicators course dataset,
+            Population ages 65 and above (% of total population).
+        </p>
+
+
+        <!-- =====================================================
+             AGAINST THE PROPOSITION
+        ====================================================== -->
+
+        <h3>AGAINST the Proposition</h3>
+
+        <figure>
+            <img
+                src="opposing-aging.png"
+                alt="Histogram showing the distribution of population age 65 and older shares across 192 ISO-coded economies in 2020."
+            >
+
+            <figcaption>
+                Figure 2: Across 192 ISO-coded economies in 2020,
+                123 economies, or 64.1%, remained below a 10% age-65+
+                population share.
+            </figcaption>
+        </figure>
+
+        <p class="rationale-title">
+            Design Decisions and Rationale:
+        </p>
+
+        <ul class="decisions">
+
+            <li>
+                <span class="score">Chosen 10% threshold — Score: -1.5.</span>
+                I emphasize the fact that 64.1% of economies were below
+                10% age 65+ in 2020. Ten percent is an intuitive round
+                threshold that supports the rhetorical idea of "fewer than
+                one in ten," but it is not a naturally defined demographic
+                boundary. I considered using the observed median or another
+                cutoff, but chose 10% because readers can interpret it
+                immediately and it produces the clearest opposing message.
+            </li>
+
+            <li>
+                <span class="score">Equal weighting of economies — Score: -1.</span>
+                Every ISO-coded economy counts once regardless of population
+                size. This makes the many economies with relatively young
+                populations more influential than they are in the
+                population-weighted World aggregate and therefore challenges
+                the idea that aging is equally widespread. I considered
+                population weighting, but that would largely reproduce the
+                global trend used in the supporting visualization, so I used
+                equal weighting to expose geographic heterogeneity instead.
+            </li>
+
+            <li>
+                <span class="score">Histogram binning — Score: +0.5.</span>
+                I grouped the observations into 2.5-percentage-point bins
+                so readers can quickly see the shape and concentration of
+                the distribution. Binning works well for revealing the
+                low-share cluster, although it hides individual economy
+                values and small differences within each bin. I considered
+                plotting all 192 economies individually, but the resulting
+                display was more cluttered, so the histogram offered a
+                clearer summary while retaining the full distribution.
+            </li>
+
+            <li>
+                <span class="score">Contextual annotations and full distribution — Score: +2.</span>
+                The chart reports the complete distribution, sample size,
+                median of about 7.1%, 10% threshold, axis labels, and the
+                64.1% calculation. Highlighting the below-threshold bars
+                supports the opposing argument, while still allowing readers
+                to see economies above 10% and judge the full distribution.
+                I considered showing only the below-10% group, but displaying
+                all observations was more transparent and prevents the
+                persuasive framing from hiding contradictory evidence.
+            </li>
+
+        </ul>
+
+        <p class="source-note">
+            Source: World Bank Human Development Indicators course dataset.
+            Analysis includes 192 ISO-coded economies with non-missing
+            2020 values.
+        </p>
+
+
+        <!-- =====================================================
+             FINAL REFLECTION
+        ====================================================== -->
+
+        <div class="reflection">
+
+            <h2>Final Reflection</h2>
+
+            <p>
+                The most straightforward part of this project was keeping the
+                underlying dataset and demographic measure constant. The more
+                difficult part was realizing how many defensible analytical
+                choices could lead readers toward very different conclusions.
+                In the supporting visualization, converting the global
+                age-65+ share to a 1960-based index changes a 4.35
+                percentage-point increase into a much more dramatic 87.5%
+                relative increase. In the opposing visualization, shifting
+                from a population-weighted global aggregate to equally
+                weighted economies makes geographic variation much more
+                prominent. Neither view requires changing the original data;
+                the persuasion emerges from transformation, aggregation,
+                scale, emphasis, and wording.
+            </p>
+
+            <p>
+                What surprised me most was that deceptive visualization does
+                not necessarily require false values or obvious manipulation.
+                Choices such as an axis range, a threshold, a denominator,
+                aggregation level, or a title can substantially influence how
+                a reader interprets accurate data. Some of these choices are
+                also necessary for effective communication, which makes the
+                boundary between persuasion and deception difficult to define.
+                I now think ethical visualization depends not only on whether
+                the numbers are technically correct, but also on whether
+                important context has been withheld in a way that prevents
+                readers from understanding reasonable alternative
+                interpretations.
+            </p>
+
+            <p>
+                My boundary between acceptable persuasion and misleading
+                visualization is therefore based primarily on transparency.
+                A visualization can emphasize a particular perspective, but
+                readers should still be given enough information to understand
+                the transformation and evaluate the claim. In these two
+                designs I intentionally use persuasive techniques, including
+                relative framing, a truncated scale, a chosen threshold, and
+                equal-country weighting, while retaining original percentages,
+                sample sizes, axis labels, annotations, and data-source notes.
+                Those disclosures do not eliminate the rhetorical effect, but
+                they make the reasoning inspectable rather than disguising it.
+            </p>
+
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>
