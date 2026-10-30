@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Wealth & Aging | Project 3</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+
+
+<body class="interactive-page">
+
+    <main class="page-shell">
+
+        <header class="hero">
+
+            <p class="eyebrow">
+                DSC 209R · Project 3 · Interactive Visualization
+            </p>
+
+            <h1>
+                Wealth & Aging
+            </h1>
+
+            <p class="hero-question">
+                How does GDP per capita relate to the share of a
+                country's population aged 65+, and how has this
+                relationship changed from 1990 to 2020?
+            </p>
+
+            <p class="hero-description">
+                Explore World Bank health and economic indicators
+                across countries. Move through time, inspect individual
+                countries, and select a country to reveal its historical
+                trajectory.
+            </p>
+
+        </header>
+
+
+        <section class="controls-panel">
+
+            <div class="control control-year">
+
+                <label for="year-slider">
+                    Year:
+                    <strong id="year-value">2020</strong>
+                </label>
+
+                <input
+                    id="year-slider"
+                    type="range"
+                    min="1990"
+                    max="2020"
+                    value="2020"
+                    step="1"
+                >
+
+                <div class="year-range-labels">
+                    <span>1990</span>
+                    <span>2020</span>
+                </div>
+
+            </div>
+
+
+            <div class="control">
+
+                <label for="country-select">
+                    Highlight a country
+                </label>
+
+                <select id="country-select">
+                    <option value="">
+                        All countries
+                    </option>
+                </select>
+
+            </div>
+
+
+            <div class="control control-button">
+
+                <button
+                    id="reset-button"
+                    type="button"
+                >
+                    Reset view
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <section
+            class="summary-grid"
+            aria-label="Summary statistics"
+        >
+
+            <article class="summary-card">
+
+                <span class="summary-label">
+                    Countries shown
+                </span>
+
+                <strong
+                    id="stat-countries"
+                    class="summary-value"
+                >
+                    —
+                </strong>
+
+            </article>
+
+
+            <article class="summary-card">
+
+                <span class="summary-label">
+                    Average age 65+
+                </span>
+
+                <strong
+                    id="stat-aging"
+                    class="summary-value"
+                >
+                    —
+                </strong>
+
+            </article>
+
+
+            <article class="summary-card">
+
+                <span class="summary-label">
+                    Median GDP per capita
+                </span>
+
+                <strong
+                    id="stat-gdp"
+                    class="summary-value"
+                >
+                    —
+                </strong>
+
+            </article>
+
+        </section>
+
+
+        <section class="visualization-panel">
+
+            <div class="chart-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        Interactive bubble chart
+                    </p>
+
+                    <h2>
+                        Wealth and population aging
+                    </h2>
+
+                </div>
+
+
+                <div class="encoding-key">
+
+                    <span>
+                        <strong>X:</strong>
+                        GDP per capita
+                    </span>
+
+                    <span>
+                        <strong>Y:</strong>
+                        Population age 65+
+                    </span>
+
+                    <span>
+                        <strong>Bubble size:</strong>
+                        Population
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <p
+                id="selection-note"
+                class="selection-note"
+            >
+                Hover over a bubble for details. Click a bubble or
+                choose a country above to reveal its trajectory.
+            </p>
+
+
+            <div
+                id="chart-container"
+                class="chart-container"
+            >
+
+                <div
+                    id="tooltip"
+                    class="tooltip"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+            </div>
+
+        </section>
+
+
+        <section class="how-to-panel">
+
+            <h2>
+                How to explore
+            </h2>
+
+            <div class="how-to-grid">
+
+                <article>
+                    <strong>1. Move through time</strong>
+                    <p>
+                        Drag the year slider to compare countries
+                        between 1990 and 2020.
+                    </p>
+                </article>
+
+                <article>
+                    <strong>2. Inspect countries</strong>
+                    <p>
+                        Hover over any bubble to see GDP, population,
+                        and the share of residents aged 65+.
+                    </p>
+                </article>
+
+                <article>
+                    <strong>3. Follow a trajectory</strong>
+                    <p>
+                        Click a country to see how its position changed
+                        across the full time period.
+                    </p>
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <section class="checkpoint-link">
+
+            <h2>
+                Exploratory analysis
+            </h2>
+
+            <p>
+                Six preliminary views were used to identify the
+                relationship explored in the final interactive graphic.
+            </p>
+
+            <a href="exploratory.html">
+                View the 6 exploratory graphs →
+            </a>
+
+        </section>
+
+
+        <footer>
+
+            <p>
+                Data source: World Bank Data by Indicators,
+                course-provided pre-cleaned health and
+                economy-and-growth datasets.
+            </p>
+
+            <p>
+                Visualization implemented with D3.js.
+            </p>
+
+        </footer>
+
+    </main>
+
+
+    <script src="project3.js"></script>
+
+</body>
+
+</html>

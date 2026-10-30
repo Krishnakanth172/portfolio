@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Project 3 Exploratory Analysis</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+
+
+<body>
+
+    <main>
+
+        <header>
+            <h1>
+                Wealth & Aging:
+                How Does Prosperity Relate to an Older Population?
+            </h1>
+
+            <p>
+                Exploratory analysis using World Bank health and
+                economy indicators from 1990–2020.
+            </p>
+
+            <p>
+                <strong>Research question:</strong>
+                How does GDP per capita relate to the share of a
+                country's population aged 65+, and how has this
+                relationship changed from 1990 to 2020?
+            </p>
+        </header>
+
+
+        <!-- =====================================================
+             GRAPH 1
+        ====================================================== -->
+
+        <section class="exploration">
+
+            <h2>
+                1. How has the share of adults aged 65+ changed
+                over time?
+            </h2>
+
+            <p>
+                Unweighted average percentage of the population
+                aged 65 and above across countries with available
+                data.
+            </p>
+
+            <div id="chart-1"></div>
+
+        </section>
+
+
+        <!-- =====================================================
+             GRAPH 2
+        ====================================================== -->
+
+        <section class="exploration">
+
+            <h2>
+                2. Are wealthier countries more likely to have
+                older populations?
+            </h2>
+
+            <p>
+                GDP per capita compared with the percentage of the
+                population aged 65 and above in 2020.
+            </p>
+
+            <div id="chart-2"></div>
+
+        </section>
+
+
+        <!-- =====================================================
+             GRAPH 3
+        ====================================================== -->
+
+        <section class="exploration">
+
+            <h2>
+                3. Does country population change how we interpret
+                wealth and aging?
+            </h2>
+
+            <p>
+                GDP per capita versus population age 65+ in 2020,
+                with bubble size representing total population.
+            </p>
+
+            <div id="chart-3"></div>
+
+        </section>
+
+
+        <!-- =====================================================
+             GRAPH 4
+        ====================================================== -->
+
+        <section class="exploration">
+
+            <h2>
+                4. How much did countries age between 1990 and
+                2020?
+            </h2>
+
+            <p>
+                Each point compares a country's share of population
+                aged 65+ in 1990 with its value in 2020. Points above
+                the diagonal indicate an increase.
+            </p>
+
+            <div id="chart-4"></div>
+
+        </section>
+
+
+        <!-- =====================================================
+             GRAPH 5
+        ====================================================== -->
+
+        <section class="exploration">
+
+            <h2>
+                5. Which countries had the oldest populations in
+                2020?
+            </h2>
+
+            <p>
+                The fifteen countries with the largest percentage
+                of residents aged 65 and above.
+            </p>
+
+            <div id="chart-5"></div>
+
+        </section>
+
+
+        <!-- =====================================================
+             GRAPH 6
+        ====================================================== -->
+
+        <section class="exploration">
+
+            <h2>
+                6. Did countries that became wealthier also become
+                older?
+            </h2>
+
+            <p>
+                Change in GDP per capita from 1990 to 2020 compared
+                with the change in the share of the population aged
+                65 and above.
+            </p>
+
+            <div id="chart-6"></div>
+
+        </section>
+
+
+        <footer>
+
+            <p>
+                Data source: World Bank Data by Indicators,
+                course-provided pre-cleaned health and
+                economy-and-growth datasets.
+            </p>
+
+        </footer>
+
+    </main>
+
+
+    <script src="exploratory.js"></script>
+
+</body>
+
+</html>
