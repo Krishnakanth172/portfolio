@@ -1,20 +1,48 @@
 console.log("IT'S ALIVE!");
 
 function $$(selector, context = document) {
-    return Array.from(context.querySelectorAll(selector));
+    return Array.from(
+        context.querySelectorAll(selector)
+    );
 }
+
 
 // ----------------------------------------------------------
 // SITE PAGES
 // ----------------------------------------------------------
 
 let pages = [
-    { url: "", title: "Home" },
-    { url: "projects/", title: "Projects" },
-    { url: "contact/", title: "Contact" },
-    { url: "resume/", title: "Resume" },
-    { url: "https://github.com/Krishnakanth172", title: "GitHub" },
+    {
+        url: "",
+        title: "Home",
+    },
+
+    {
+        url: "projects/",
+        title: "Projects",
+    },
+
+    {
+        url: "contact/",
+        title: "Contact",
+    },
+
+    {
+        url: "resume/",
+        title: "Resume",
+    },
+
+    {
+        url: "meta/",
+        title: "Meta",
+    },
+
+    {
+        url: "https://github.com/Krishnakanth172",
+        title: "GitHub",
+    },
 ];
+
 
 // ----------------------------------------------------------
 // BASE PATH
@@ -32,13 +60,16 @@ const BASE_PATH =
         ? "/"
         : "/portfolio/";
 
+
 // ----------------------------------------------------------
 // CREATE NAVIGATION
 // ----------------------------------------------------------
 
-let nav = document.createElement("nav");
+let nav =
+    document.createElement("nav");
 
 document.body.prepend(nav);
+
 
 // ----------------------------------------------------------
 // CREATE EACH NAV LINK
@@ -48,31 +79,46 @@ for (let p of pages) {
     let url = p.url;
     let title = p.title;
 
-    // Add correct base path to internal links
-    url = !url.startsWith("http")
-        ? BASE_PATH + url
-        : url;
 
-    let a = document.createElement("a");
+    url =
+        !url.startsWith("http")
+            ? BASE_PATH + url
+            : url;
+
+
+    let a =
+        document.createElement("a");
+
 
     a.href = url;
+
     a.textContent = title;
 
-    // Highlight current page
+
     if (
         a.host === location.host &&
         a.pathname === location.pathname
     ) {
-        a.classList.add("current");
+        a.classList.add(
+            "current"
+        );
     }
 
-    // Open external links in a new tab
-    if (a.host !== location.host) {
+
+    if (
+        a.host !== location.host
+    ) {
         a.target = "_blank";
+
+        a.rel =
+            "noopener noreferrer";
     }
+
 
     nav.append(a);
 }
+
+
 // ----------------------------------------------------------
 // THEME SWITCHER
 // ----------------------------------------------------------
@@ -90,39 +136,72 @@ document.body.insertAdjacentHTML(
     </label>
     `
 );
+
+
 // ----------------------------------------------------------
 // MAKE THEME SWITCHER WORK
 // ----------------------------------------------------------
 
-let select = document.querySelector(".color-scheme select");
-
-function setColorScheme(colorScheme) {
-    document.documentElement.style.setProperty(
-        "color-scheme",
-        colorScheme
+let select =
+    document.querySelector(
+        ".color-scheme select"
     );
 
-    select.value = colorScheme;
+
+function setColorScheme(
+    colorScheme
+) {
+    document.documentElement
+        .style
+        .setProperty(
+            "color-scheme",
+            colorScheme
+        );
+
+
+    select.value =
+        colorScheme;
 }
 
-if ("colorScheme" in localStorage) {
-    setColorScheme(localStorage.colorScheme);
+
+if (
+    "colorScheme" in localStorage
+) {
+    setColorScheme(
+        localStorage.colorScheme
+    );
 }
 
-select.addEventListener("input", function (event) {
-    let colorScheme = event.target.value;
 
-    setColorScheme(colorScheme);
+select.addEventListener(
+    "input",
+    function (event) {
+        let colorScheme =
+            event.target.value;
 
-    localStorage.colorScheme = colorScheme;
-});
+
+        setColorScheme(
+            colorScheme
+        );
+
+
+        localStorage.colorScheme =
+            colorScheme;
+    }
+);
+
+
 // ----------------------------------------------------------
 // FETCH JSON DATA
 // ----------------------------------------------------------
 
-export async function fetchJSON(url) {
+export async function fetchJSON(
+    url
+) {
     try {
-        const response = await fetch(url);
+        const response =
+            await fetch(url);
+
 
         if (!response.ok) {
             throw new Error(
@@ -130,9 +209,9 @@ export async function fetchJSON(url) {
             );
         }
 
-        const data = await response.json();
 
-        return data;
+        return await response.json();
+
     } catch (error) {
         console.error(
             "Error fetching or parsing JSON data:",
@@ -140,6 +219,8 @@ export async function fetchJSON(url) {
         );
     }
 }
+
+
 // ----------------------------------------------------------
 // RENDER PROJECTS
 // ----------------------------------------------------------
@@ -147,12 +228,20 @@ export async function fetchJSON(url) {
 export function renderProjects(
     projects,
     containerElement,
-    headingLevel = 'h2'
+    headingLevel = "h2"
 ) {
-    containerElement.innerHTML = '';
+    containerElement.innerHTML = "";
 
-    for (let project of projects) {
-        const article = document.createElement('article');
+
+    for (
+        let project
+        of projects
+    ) {
+        const article =
+            document.createElement(
+                "article"
+            );
+
 
         article.innerHTML = `
             <${headingLevel}>${project.title}</${headingLevel}>
@@ -163,13 +252,23 @@ export function renderProjects(
             </div>
         `;
 
-        containerElement.appendChild(article);
+
+        containerElement
+            .appendChild(
+                article
+            );
     }
 }
+
+
 // ----------------------------------------------------------
 // FETCH GITHUB DATA
 // ----------------------------------------------------------
 
-export async function fetchGitHubData(username) {
-    return fetchJSON(`https://api.github.com/users/${username}`);
+export async function fetchGitHubData(
+    username
+) {
+    return fetchJSON(
+        `https://api.github.com/users/${username}`
+    );
 }
