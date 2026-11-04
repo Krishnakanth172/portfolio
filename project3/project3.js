@@ -994,7 +994,7 @@ function updateSelectionNote() {
     ) {
 
         note.text(
-            "Hover over a bubble for details. Click a bubble or choose a country above to reveal its trajectory."
+            "Each year shows countries with complete GDP, population, and age-65+ observations after removing World Bank aggregate regions. Hover for details, or select a country to reveal its historical trajectory."
         );
 
         return;

@@ -200,8 +200,10 @@
                 id="selection-note"
                 class="selection-note"
             >
-                Hover over a bubble for details. Click a bubble or
-                choose a country above to reveal its trajectory.
+                Each year shows countries with complete GDP, population,
+                and age-65+ observations after removing World Bank aggregate
+                regions. Hover for details, or select a country to reveal its
+                historical trajectory.
             </p>
 
 
@@ -273,6 +275,104 @@
             <a href="exploratory.html">
                 View the 6 exploratory graphs →
             </a>
+
+        </section>
+
+
+        <section class="project-writeup">
+
+            <h2>
+                Design Rationale
+            </h2>
+
+            <p>
+                This visualization explores how economic prosperity relates
+                to population aging across countries from 1990 to 2020.
+                GDP per capita is encoded on the horizontal axis using a
+                logarithmic scale because values vary substantially across
+                countries, while the percentage of the population aged 65
+                and above is encoded on the vertical axis. Each country is
+                represented by a circle, with circle size encoding total
+                population.
+            </p>
+
+            <p>
+                I chose a bubble scatterplot because position provides a
+                direct way to compare the relationship between two
+                quantitative variables while population size adds useful
+                context without requiring a separate chart. I considered
+                separate country-level line charts and small multiples, but
+                these made cross-country comparison more difficult and
+                increased visual complexity.
+            </p>
+
+            <p>
+                The year slider acts as a dynamic query that lets the reader
+                examine how the relationship changes over time. Hover
+                tooltips provide details on demand, while country selection
+                highlights one country and displays its historical trajectory
+                across the full period. The remaining countries are
+                deemphasized so the selected trajectory can be interpreted
+                without losing the global context.
+            </p>
+
+            <p>
+                A restrained blue palette is used for the country bubbles so the
+                overall distribution remains visually calm, while orange is reserved
+                for the selected country and its historical trajectory. This creates
+                a clear contrast between context and focus without assigning
+                categorical meaning to countries through many competing colors.
+            </p>
+
+
+            <h2>
+                Data Preparation
+            </h2>
+
+            <p>
+                The visualization uses the course-provided World Bank health
+                and economy-and-growth datasets. I merged the datasets by
+                country, country code, and year; restricted the analysis to
+                1990–2020; removed aggregate World Bank regions; and excluded
+                observations missing GDP per capita, population, or
+                population-age-65+ values.
+            </p>
+
+            <p>
+                The final visualization uses GDP per capita in constant 2017
+                international dollars, total population, and the percentage
+                of each country's population aged 65 and above.
+            </p>
+
+
+            <h2>
+                Development Process
+            </h2>
+
+            <p>
+                I completed this project individually with instructor
+                approval. I spent approximately 12–15 hours on the project,
+                including dataset inspection and preprocessing, exploratory
+                analysis, D3 implementation, interaction design, debugging,
+                responsive styling, and deployment.
+            </p>
+
+            <p>
+                The most time-consuming parts were combining and validating
+                the World Bank indicators, designing interactions that
+                remained understandable across many countries, and
+                implementing the selected-country trajectory while keeping
+                the visualization responsive.
+            </p>
+
+            <p>
+                Six exploratory visualizations were created first to evaluate
+                temporal aging trends, the wealth-aging relationship,
+                population effects, country-level change, the oldest
+                populations, and changes in wealth alongside changes in
+                aging. These explorations led to the final interactive
+                question and bubble-chart design.
+            </p>
 
         </section>
 

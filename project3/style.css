@@ -514,3 +514,47 @@ footer p {
     }
 
 }
+/* =========================================================
+   PROJECT WRITE-UP
+========================================================= */
+
+.project-writeup {
+    margin-top: 18px;
+    padding: 28px;
+    border: 1px solid #dde3ea;
+    border-radius: 20px;
+    background: white;
+}
+
+.project-writeup h2 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+.project-writeup h2:first-child {
+    margin-top: 0;
+}
+
+.project-writeup p {
+    max-width: 88ch;
+    margin-bottom: 16px;
+    color: #475467;
+    line-height: 1.75;
+}
+
+.project-writeup p:last-child {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   PROJECT WRITE-UP RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .project-writeup {
+        padding: 20px;
+    }
+
+}
