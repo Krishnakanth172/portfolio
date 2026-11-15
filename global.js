@@ -243,12 +243,23 @@ export function renderProjects(
             );
 
 
+        const imageUrl =
+            project.image.startsWith("http")
+                ? project.image
+                : BASE_PATH + project.image;
+
+
         article.innerHTML = `
             <${headingLevel}>${project.title}</${headingLevel}>
-            <img src="${project.image}" alt="${project.title}">
+            <img src="${imageUrl}" alt="${project.title}">
             <div>
                 <p>${project.description}</p>
                 <p class="project-year">${project.year}</p>
+                ${
+                    project.url
+                        ? `<a href="${project.url}" target="_blank" rel="noopener noreferrer">View project</a>`
+                        : ""
+                }
             </div>
         `;
 
@@ -259,7 +270,6 @@ export function renderProjects(
             );
     }
 }
-
 
 // ----------------------------------------------------------
 // FETCH GITHUB DATA

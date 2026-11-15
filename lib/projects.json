@@ -1,4 +1,11 @@
 [
+{
+    "title": "Bikewatching: Boston Bike Traffic",
+    "year": 2026,
+    "image": "images/bikewatching.png",
+    "description": "Built an interactive Mapbox and D3 visualization of Boston and Cambridge bike traffic, with bike-lane overlays, traffic-scaled Bluebike stations, time filtering, tooltips, and directional flow.",
+    "url": "https://krishnakanth172.github.io/bikewatching/"
+    }, 
     {
         "title": "Agentic AI Evaluation, Observability & Release-Gate Platform",
         "year": 2026,
