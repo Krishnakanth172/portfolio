@@ -1,4 +1,5 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
+import scrollama from 'https://cdn.jsdelivr.net/npm/scrollama@3.2.0/+esm';
 
 
 // ==================================================
@@ -7,13 +8,52 @@ import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 
 let data = [];
 let commits = [];
+let displayedCommits = [];
 
 let xScale;
 let yScale;
+let timeScale;
+
+let commitProgress = 100;
+let commitMaxTime;
+
+let brush;
+let brushGroup;
+let scroller;
 
 
 // ==================================================
-// LOAD CSV DATA
+// CHART CONSTANTS
+// ==================================================
+
+const WIDTH = 1000;
+const HEIGHT = 600;
+
+const MARGIN = {
+    top: 20,
+    right: 25,
+    bottom: 55,
+    left: 70,
+};
+
+const USABLE = {
+    top: MARGIN.top,
+    right: WIDTH - MARGIN.right,
+    bottom: HEIGHT - MARGIN.bottom,
+    left: MARGIN.left,
+    width:
+        WIDTH -
+        MARGIN.left -
+        MARGIN.right,
+    height:
+        HEIGHT -
+        MARGIN.top -
+        MARGIN.bottom,
+};
+
+
+// ==================================================
+// LOAD CSV
 // ==================================================
 
 async function loadData() {
@@ -41,7 +81,7 @@ async function loadData() {
 
 
 // ==================================================
-// PROCESS COMMIT DATA
+// PROCESS COMMITS
 // ==================================================
 
 function processCommits(data) {
@@ -61,7 +101,6 @@ function processCommits(data) {
                     timezone,
                     datetime,
                 } = first;
-
 
                 const result = {
                     id: commit,
@@ -84,7 +123,6 @@ function processCommits(data) {
                         lines.length,
                 };
 
-
                 Object.defineProperty(
                     result,
                     'lines',
@@ -96,38 +134,42 @@ function processCommits(data) {
                     }
                 );
 
-
                 return result;
             }
+        )
+        .sort(
+            (a, b) =>
+                a.datetime - b.datetime
         );
 }
 
 
 // ==================================================
-// SUMMARY STATISTICS
+// SUMMARY STATS
 // ==================================================
 
 function renderCommitInfo(
     data,
     commits
 ) {
-    const statsContainer =
+    const container =
         d3.select('#stats');
 
+    if (container.empty()) {
+        return;
+    }
 
-    statsContainer
+    container
         .selectAll('*')
         .remove();
 
-
     const dl =
-        statsContainer
+        container
             .append('dl')
             .attr(
                 'class',
                 'stats meta-stats'
             );
-
 
     const fileGroups =
         d3.group(
@@ -135,20 +177,17 @@ function renderCommitInfo(
             (d) => d.file
         );
 
-
     const maxDepth =
         d3.max(
             data,
             (d) => d.depth
         );
 
-
     const averageLineLength =
         d3.mean(
             data,
             (d) => d.length
         );
-
 
     const fileLengths =
         d3.rollups(
@@ -161,13 +200,11 @@ function renderCommitInfo(
             (d) => d.file
         );
 
-
     const longestFile =
         d3.greatest(
             fileLengths,
             (d) => d[1]
         );
-
 
     const stats = [
         [
@@ -205,7 +242,6 @@ function renderCommitInfo(
         ],
     ];
 
-
     for (
         const [label, value]
         of stats
@@ -220,7 +256,7 @@ function renderCommitInfo(
 
 
 // ==================================================
-// TOOLTIP CONTENT
+// TOOLTIP
 // ==================================================
 
 function renderTooltipContent(
@@ -229,7 +265,6 @@ function renderTooltipContent(
     if (!commit) {
         return;
     }
-
 
     const link =
         document.getElementById(
@@ -256,6 +291,15 @@ function renderTooltipContent(
             'commit-lines'
         );
 
+    if (
+        !link ||
+        !date ||
+        !time ||
+        !author ||
+        !lines
+    ) {
+        return;
+    }
 
     link.href =
         commit.url;
@@ -266,57 +310,48 @@ function renderTooltipContent(
             7
         );
 
-
     date.textContent =
         commit.datetime
             .toLocaleDateString(
-                'en',
+                'en-US',
                 {
                     dateStyle: 'full',
                 }
             );
 
-
     time.textContent =
         commit.datetime
             .toLocaleTimeString(
-                'en',
+                'en-US',
                 {
                     timeStyle: 'short',
                 }
             );
 
-
     author.textContent =
         commit.author;
-
 
     lines.textContent =
         commit.totalLines;
 }
 
 
-// ==================================================
-// TOOLTIP VISIBILITY
-// ==================================================
-
 function updateTooltipVisibility(
-    isVisible
+    visible
 ) {
     const tooltip =
         document.getElementById(
             'commit-tooltip'
         );
 
+    if (!tooltip) {
+        return;
+    }
 
     tooltip.hidden =
-        !isVisible;
+        !visible;
 }
 
-
-// ==================================================
-// TOOLTIP POSITION
-// ==================================================
 
 function updateTooltipPosition(
     event
@@ -326,9 +361,11 @@ function updateTooltipPosition(
             'commit-tooltip'
         );
 
+    if (!tooltip) {
+        return;
+    }
 
     const offset = 14;
-
 
     tooltip.style.left =
         `${event.clientX + offset}px`;
@@ -339,35 +376,35 @@ function updateTooltipPosition(
 
 
 // ==================================================
-// TEST WHETHER COMMIT IS INSIDE BRUSH
+// BRUSHING
 // ==================================================
 
 function isCommitSelected(
     selection,
     commit
 ) {
-    if (!selection) {
+    if (
+        !selection ||
+        !xScale ||
+        !yScale
+    ) {
         return false;
     }
-
 
     const [
         [x0, y0],
         [x1, y1],
     ] = selection;
 
-
     const x =
         xScale(
             commit.datetime
         );
 
-
     const y =
         yScale(
             commit.hourFrac
         );
-
 
     return (
         x >= x0 &&
@@ -378,10 +415,6 @@ function isCommitSelected(
 }
 
 
-// ==================================================
-// SELECTED COMMIT COUNT
-// ==================================================
-
 function getSelectedCommits(
     selection
 ) {
@@ -389,8 +422,7 @@ function getSelectedCommits(
         return [];
     }
 
-
-    return commits.filter(
+    return displayedCommits.filter(
         (commit) =>
             isCommitSelected(
                 selection,
@@ -403,78 +435,70 @@ function getSelectedCommits(
 function renderSelectionCount(
     selection
 ) {
-    const selectedCommits =
+    const selected =
         getSelectedCommits(
             selection
         );
 
-
-    const countElement =
+    const element =
         document.querySelector(
             '#selection-count'
         );
 
+    if (!element) {
+        return selected;
+    }
 
-    countElement.textContent =
-        selectedCommits.length
-            ? `${selectedCommits.length} commits selected`
+    element.textContent =
+        selected.length
+            ? `${selected.length} commits selected`
             : 'No commits selected';
 
-
-    return selectedCommits;
+    return selected;
 }
 
-
-// ==================================================
-// LANGUAGE BREAKDOWN
-// ==================================================
 
 function renderLanguageBreakdown(
     selection
 ) {
-    const selectedCommits =
+    const selected =
         getSelectedCommits(
             selection
         );
-
 
     const container =
         document.getElementById(
             'language-breakdown'
         );
 
+    if (!container) {
+        return;
+    }
 
     container.innerHTML = '';
 
-
     if (
-        selectedCommits.length === 0
+        selected.length === 0
     ) {
         return;
     }
 
-
     const lines =
-        selectedCommits
-            .flatMap(
-                (commit) =>
-                    commit.lines
-            );
-
+        selected.flatMap(
+            (commit) =>
+                commit.lines
+        );
 
     const breakdown =
         d3.rollup(
             lines,
-
             (values) =>
                 values.length,
-
             (d) =>
-                d.type
+                d.type || 'Other'
         );
 
-
-    const sortedBreakdown =
+    const sorted =
         Array.from(
             breakdown.entries()
         )
@@ -483,24 +507,21 @@ function renderLanguageBreakdown(
                     b[1] - a[1]
             );
 
-
     for (
         const [
             language,
             count,
         ]
-        of sortedBreakdown
+        of sorted
     ) {
         const proportion =
             count /
             lines.length;
 
-
         const formatted =
             d3.format('.1~%')(
                 proportion
             );
-
 
         container.innerHTML += `
             <dt>${language}</dt>
@@ -512,19 +533,14 @@ function renderLanguageBreakdown(
 }
 
 
-// ==================================================
-// BRUSH EVENT
-// ==================================================
-
 function brushed(
     event
 ) {
     const selection =
         event.selection;
 
-
     d3.selectAll(
-        '#chart circle'
+        '#chart .dots circle'
     )
         .classed(
             'selected',
@@ -535,11 +551,9 @@ function brushed(
                 )
         );
 
-
     renderSelectionCount(
         selection
     );
-
 
     renderLanguageBreakdown(
         selection
@@ -547,72 +561,134 @@ function brushed(
 }
 
 
+function clearBrush() {
+    if (
+        brushGroup &&
+        brush
+    ) {
+        brushGroup.call(
+            brush.move,
+            null
+        );
+    }
+}
+
+
 // ==================================================
-// SCATTERPLOT
+// DATE DOMAIN HELPER
+// ==================================================
+
+function getDateDomain(
+    commitsToShow
+) {
+    const extent =
+        d3.extent(
+            commitsToShow,
+            (d) => d.datetime
+        );
+
+    if (
+        !extent[0] ||
+        !extent[1]
+    ) {
+        return [
+            new Date(),
+            new Date(),
+        ];
+    }
+
+    if (
+        +extent[0] ===
+        +extent[1]
+    ) {
+        const padding =
+            12 * 60 * 60 * 1000;
+
+        return [
+            new Date(
+                +extent[0] -
+                padding
+            ),
+
+            new Date(
+                +extent[1] +
+                padding
+            ),
+        ];
+    }
+
+    return extent;
+}
+
+
+// ==================================================
+// RADIUS SCALE
+// ==================================================
+
+function makeRadiusScale(
+    commitsToShow
+) {
+    const [
+        minLines,
+        maxLines,
+    ] =
+        d3.extent(
+            commitsToShow,
+            (d) =>
+                d.totalLines
+        );
+
+    if (
+        minLines === undefined ||
+        maxLines === undefined
+    ) {
+        return () => 5;
+    }
+
+    if (
+        minLines === maxLines
+    ) {
+        return () => 8;
+    }
+
+    return d3
+        .scaleSqrt()
+        .domain([
+            minLines,
+            maxLines,
+        ])
+        .range([
+            3,
+            26,
+        ]);
+}
+
+
+// ==================================================
+// INITIAL SCATTERPLOT
 // ==================================================
 
 function renderScatterPlot(
-    commits
+    commitsToShow
 ) {
+    displayedCommits =
+        [...commitsToShow];
+
     const chart =
         d3.select(
             '#chart'
         );
 
-
     chart
         .selectAll('*')
         .remove();
-
-
-    const width =
-        1000;
-
-    const height =
-        600;
-
-
-    const margin = {
-        top: 20,
-        right: 25,
-        bottom: 55,
-        left: 70,
-    };
-
-
-    const usableArea = {
-        top:
-            margin.top,
-
-        right:
-            width -
-            margin.right,
-
-        bottom:
-            height -
-            margin.bottom,
-
-        left:
-            margin.left,
-
-        width:
-            width -
-            margin.left -
-            margin.right,
-
-        height:
-            height -
-            margin.top -
-            margin.bottom,
-    };
-
 
     const svg =
         chart
             .append('svg')
             .attr(
                 'viewBox',
-                `0 0 ${width} ${height}`
+                `0 0 ${WIDTH} ${HEIGHT}`
             )
             .style(
                 'overflow',
@@ -620,25 +696,22 @@ function renderScatterPlot(
             );
 
 
-    // ==================================================
-    // SCALES
-    // ==================================================
+    // ------------------------------
+    // Scales
+    // ------------------------------
 
     xScale =
         d3.scaleTime()
             .domain(
-                d3.extent(
-                    commits,
-                    (d) =>
-                        d.datetime
+                getDateDomain(
+                    commitsToShow
                 )
             )
             .range([
-                usableArea.left,
-                usableArea.right,
+                USABLE.left,
+                USABLE.right,
             ])
             .nice();
-
 
     yScale =
         d3.scaleLinear()
@@ -647,37 +720,20 @@ function renderScatterPlot(
                 24,
             ])
             .range([
-                usableArea.bottom,
-                usableArea.top,
+                USABLE.bottom,
+                USABLE.top,
             ]);
-
-
-    const [
-        minLines,
-        maxLines,
-    ] =
-        d3.extent(
-            commits,
-            (d) =>
-                d.totalLines
-        );
 
 
     const rScale =
-        d3.scaleSqrt()
-            .domain([
-                minLines,
-                maxLines,
-            ])
-            .range([
-                3,
-                26,
-            ]);
+        makeRadiusScale(
+            commitsToShow
+        );
 
 
-    // ==================================================
-    // HORIZONTAL GRID LINES
-    // ==================================================
+    // ------------------------------
+    // Grid
+    // ------------------------------
 
     svg
         .append('g')
@@ -687,7 +743,7 @@ function renderScatterPlot(
         )
         .attr(
             'transform',
-            `translate(${usableArea.left}, 0)`
+            `translate(${USABLE.left}, 0)`
         )
         .call(
             d3.axisLeft(
@@ -695,20 +751,19 @@ function renderScatterPlot(
             )
                 .tickFormat('')
                 .tickSize(
-                    -usableArea.width
+                    -USABLE.width
                 )
         );
 
 
-    // ==================================================
-    // AXES
-    // ==================================================
+    // ------------------------------
+    // Axes
+    // ------------------------------
 
     const xAxis =
         d3.axisBottom(
             xScale
         );
-
 
     const yAxis =
         d3.axisLeft(
@@ -731,11 +786,11 @@ function renderScatterPlot(
         .append('g')
         .attr(
             'class',
-            'meta-axis'
+            'meta-axis x-axis'
         )
         .attr(
             'transform',
-            `translate(0, ${usableArea.bottom})`
+            `translate(0, ${USABLE.bottom})`
         )
         .call(
             xAxis
@@ -746,20 +801,20 @@ function renderScatterPlot(
         .append('g')
         .attr(
             'class',
-            'meta-axis'
+            'meta-axis y-axis'
         )
         .attr(
             'transform',
-            `translate(${usableArea.left}, 0)`
+            `translate(${USABLE.left}, 0)`
         )
         .call(
             yAxis
         );
 
 
-    // ==================================================
-    // AXIS LABELS
-    // ==================================================
+    // ------------------------------
+    // Axis labels
+    // ------------------------------
 
     svg
         .append('text')
@@ -769,12 +824,12 @@ function renderScatterPlot(
         )
         .attr(
             'x',
-            usableArea.left +
-            usableArea.width / 2
+            USABLE.left +
+            USABLE.width / 2
         )
         .attr(
             'y',
-            height - 8
+            HEIGHT - 8
         )
         .attr(
             'text-anchor',
@@ -798,8 +853,8 @@ function renderScatterPlot(
         .attr(
             'x',
             -(
-                usableArea.top +
-                usableArea.height / 2
+                USABLE.top +
+                USABLE.height / 2
             )
         )
         .attr(
@@ -815,66 +870,155 @@ function renderScatterPlot(
         );
 
 
-    // ==================================================
-    // DOTS
-    // ==================================================
+    // ------------------------------
+    // Dots
+    // ------------------------------
 
-    const sortedCommits =
-        d3.sort(
-            commits,
-            (d) =>
-                -d.totalLines
+    svg
+        .append('g')
+        .attr(
+            'class',
+            'dots'
         );
 
 
-    const dots =
+    updateDots(
+        commitsToShow,
+        rScale,
+        false
+    );
+
+
+    // ------------------------------
+    // Brush
+    // ------------------------------
+
+    brush =
+        d3.brush()
+            .extent([
+                [
+                    USABLE.left,
+                    USABLE.top,
+                ],
+                [
+                    USABLE.right,
+                    USABLE.bottom,
+                ],
+            ])
+            .on(
+                'start brush end',
+                brushed
+            );
+
+
+    brushGroup =
         svg
             .append('g')
             .attr(
                 'class',
-                'dots'
+                'brush'
+            )
+            .call(
+                brush
             );
 
 
-    dots
-        .selectAll(
-            'circle'
+    // Keep dots above brush overlay so
+    // point hover still works.
+    svg
+        .select(
+            '.dots'
         )
-        .data(
-            sortedCommits
-        )
-        .join(
-            'circle'
-        )
-        .attr(
-            'cx',
+        .raise();
+}
+
+
+// ==================================================
+// DOT JOIN / UPDATE
+// ==================================================
+
+function updateDots(
+    commitsToShow,
+    rScale =
+        makeRadiusScale(
+            commitsToShow
+        ),
+    animate = true
+) {
+    const svg =
+        d3.select(
+            '#chart svg'
+        );
+
+    if (
+        svg.empty()
+    ) {
+        return;
+    }
+
+    const sorted =
+        d3.sort(
+            commitsToShow,
             (d) =>
-                xScale(
-                    d.datetime
-                )
-        )
-        .attr(
-            'cy',
-            (d) =>
-                yScale(
-                    d.hourFrac
-                )
-        )
-        .attr(
-            'r',
-            (d) =>
-                rScale(
-                    d.totalLines
-                )
-        )
-        .attr(
-            'fill',
-            'steelblue'
-        )
-        .style(
-            'fill-opacity',
-            0.7
-        )
+                -d.totalLines
+        );
+
+    const circles =
+        svg
+            .select(
+                '.dots'
+            )
+            .selectAll(
+                'circle'
+            )
+            .data(
+                sorted,
+                (d) => d.id
+            );
+
+
+    const entered =
+        circles
+            .enter()
+            .append(
+                'circle'
+            )
+            .attr(
+                'cx',
+                (d) =>
+                    xScale(
+                        d.datetime
+                    )
+            )
+            .attr(
+                'cy',
+                (d) =>
+                    yScale(
+                        d.hourFrac
+                    )
+            )
+            .attr(
+                'r',
+                0
+            )
+            .attr(
+                'fill',
+                'steelblue'
+            )
+            .style(
+                'fill-opacity',
+                0
+            );
+
+
+    const merged =
+        entered
+            .merge(
+                circles
+            );
+
+
+    merged
         .on(
             'mouseenter',
             (
@@ -889,16 +1033,13 @@ function renderScatterPlot(
                         1
                     );
 
-
                 renderTooltipContent(
                     commit
                 );
 
-
                 updateTooltipVisibility(
                     true
                 );
-
 
                 updateTooltipPosition(
                     event
@@ -924,7 +1065,6 @@ function renderScatterPlot(
                         0.7
                     );
 
-
                 updateTooltipVisibility(
                     false
                 );
@@ -932,63 +1072,774 @@ function renderScatterPlot(
         );
 
 
-    // ==================================================
-    // BRUSH
-    // ==================================================
-
-    const brush =
-        d3.brush()
-            .extent([
-                [
-                    usableArea.left,
-                    usableArea.top,
-                ],
-                [
-                    usableArea.right,
-                    usableArea.bottom,
-                ],
-            ])
-            .on(
-                'start brush end',
-                brushed
+    if (animate) {
+        merged
+            .transition()
+            .duration(
+                250
+            )
+            .attr(
+                'cx',
+                (d) =>
+                    xScale(
+                        d.datetime
+                    )
+            )
+            .attr(
+                'cy',
+                (d) =>
+                    yScale(
+                        d.hourFrac
+                    )
+            )
+            .attr(
+                'r',
+                (d) =>
+                    rScale(
+                        d.totalLines
+                    )
+            )
+            .style(
+                'fill-opacity',
+                0.7
             );
 
 
-    svg.call(
-        brush
+        circles
+            .exit()
+            .transition()
+            .duration(
+                200
+            )
+            .attr(
+                'r',
+                0
+            )
+            .style(
+                'fill-opacity',
+                0
+            )
+            .remove();
+    }
+
+    else {
+        merged
+            .attr(
+                'cx',
+                (d) =>
+                    xScale(
+                        d.datetime
+                    )
+            )
+            .attr(
+                'cy',
+                (d) =>
+                    yScale(
+                        d.hourFrac
+                    )
+            )
+            .attr(
+                'r',
+                (d) =>
+                    rScale(
+                        d.totalLines
+                    )
+            )
+            .style(
+                'fill-opacity',
+                0.7
+            );
+
+        circles
+            .exit()
+            .remove();
+    }
+}
+
+
+// ==================================================
+// UPDATE EXISTING SCATTERPLOT
+// ==================================================
+
+function updateScatterPlot(
+    commitsToShow
+) {
+    if (
+        !commitsToShow.length
+    ) {
+        return;
+    }
+
+    displayedCommits =
+        [...commitsToShow];
+
+    const svg =
+        d3.select(
+            '#chart svg'
+        );
+
+    if (
+        svg.empty()
+    ) {
+        renderScatterPlot(
+            commitsToShow
+        );
+
+        return;
+    }
+
+
+    // Clear an existing Lab 6 brush
+    // before changing coordinate scales.
+    clearBrush();
+
+
+    xScale
+        .domain(
+            getDateDomain(
+                commitsToShow
+            )
+        )
+        .nice();
+
+
+    const xAxis =
+        d3.axisBottom(
+            xScale
+        );
+
+
+    svg
+        .select(
+            '.x-axis'
+        )
+        .transition()
+        .duration(
+            250
+        )
+        .call(
+            xAxis
+        );
+
+
+    const rScale =
+        makeRadiusScale(
+            commitsToShow
+        );
+
+
+    updateDots(
+        commitsToShow,
+        rScale,
+        true
     );
 
 
-    // Move dots above the brush overlay so
-    // hover interactions continue to work.
     svg
-        .selectAll(
-            '.dots, .overlay ~ *'
+        .select(
+            '.dots'
         )
         .raise();
 }
 
 
 // ==================================================
-// INITIALIZE PAGE
+// LAB 8 — FILE UNIT VISUALIZATION
 // ==================================================
 
-data =
-    await loadData();
-
-
-commits =
-    processCommits(
-        data
+const technologyColor =
+    d3.scaleOrdinal(
+        d3.schemeTableau10
     );
 
 
-renderCommitInfo(
-    data,
-    commits
-);
+function updateFileDisplay(
+    commitsToShow
+) {
+    const container =
+        d3.select(
+            '#files'
+        );
+
+    if (
+        container.empty()
+    ) {
+        return;
+    }
 
 
-renderScatterPlot(
-    commits
-);
+    const lines =
+        commitsToShow.flatMap(
+            (commit) =>
+                commit.lines
+        );
+
+
+    const files =
+        d3.groups(
+            lines,
+            (d) => d.file
+        )
+            .map(
+                ([name, fileLines]) => ({
+                    name,
+                    lines: fileLines,
+                })
+            )
+            .sort(
+                (a, b) =>
+                    b.lines.length -
+                    a.lines.length
+            );
+
+
+    const rows =
+        container
+            .selectAll(
+                'div.file-row'
+            )
+            .data(
+                files,
+                (d) => d.name
+            )
+            .join(
+                (enter) => {
+                    const row =
+                        enter
+                            .append(
+                                'div'
+                            )
+                            .attr(
+                                'class',
+                                'file-row'
+                            );
+
+
+                    const dt =
+                        row
+                            .append(
+                                'dt'
+                            );
+
+
+                    dt
+                        .append(
+                            'code'
+                        );
+
+
+                    dt
+                        .append(
+                            'small'
+                        );
+
+
+                    row
+                        .append(
+                            'dd'
+                        );
+
+
+                    return row;
+                },
+
+                (update) =>
+                    update,
+
+                (exit) =>
+                    exit.remove()
+            );
+
+
+    rows
+        .select(
+            'dt > code'
+        )
+        .text(
+            (d) =>
+                d.name
+        );
+
+
+    rows
+        .select(
+            'dt > small'
+        )
+        .text(
+            (d) =>
+                `${d.lines.length} lines`
+        );
+
+
+    rows
+        .select(
+            'dd'
+        )
+        .selectAll(
+            'div.loc'
+        )
+        .data(
+            (d) =>
+                d.lines,
+            (d, i) =>
+                `${d.commit}-${d.file}-${d.line}-${i}`
+        )
+        .join(
+            'div'
+        )
+        .attr(
+            'class',
+            'loc'
+        )
+        .style(
+            '--color',
+            (d) =>
+                technologyColor(
+                    d.type ||
+                    'Other'
+                )
+        )
+        .attr(
+            'title',
+            (d) =>
+                `${d.type || 'Other'} — ${d.file}:${d.line}`
+        );
+}
+
+
+// ==================================================
+// LAB 8 — SLIDER LABEL
+// ==================================================
+
+function updateCommitTimeLabel() {
+    const element =
+        document.getElementById(
+            'commit-max-time'
+        );
+
+    if (
+        !element ||
+        !commitMaxTime
+    ) {
+        return;
+    }
+
+    element.dateTime =
+        commitMaxTime
+            .toISOString();
+
+    element.textContent =
+        commitMaxTime
+            .toLocaleString(
+                'en-US',
+                {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                }
+            );
+}
+
+
+// ==================================================
+// LAB 8 — APPLY TIME FILTER
+// ==================================================
+
+function applyTimeFilter(
+    maxTime,
+    {
+        syncSlider = true,
+    } = {}
+) {
+    commitMaxTime =
+        maxTime;
+
+
+    const filtered =
+        commits.filter(
+            (commit) =>
+                commit.datetime <=
+                commitMaxTime
+        );
+
+
+    if (
+        !filtered.length
+    ) {
+        return;
+    }
+
+
+    updateCommitTimeLabel();
+
+
+    if (
+        syncSlider &&
+        timeScale
+    ) {
+        commitProgress =
+            Math.max(
+                0,
+                Math.min(
+                    100,
+                    timeScale(
+                        commitMaxTime
+                    )
+                )
+            );
+
+
+        const slider =
+            document.getElementById(
+                'commit-progress'
+            );
+
+
+        if (slider) {
+            slider.value =
+                commitProgress;
+        }
+    }
+
+
+    updateScatterPlot(
+        filtered
+    );
+
+
+    updateFileDisplay(
+        filtered
+    );
+}
+
+
+// ==================================================
+// LAB 8 — SLIDER
+// ==================================================
+
+function setupSlider() {
+    const slider =
+        document.getElementById(
+            'commit-progress'
+        );
+
+
+    if (!slider) {
+        return;
+    }
+
+
+    slider.value =
+        commitProgress;
+
+
+    slider.addEventListener(
+        'input',
+        (event) => {
+            commitProgress =
+                Number(
+                    event.target.value
+                );
+
+
+            commitMaxTime =
+                timeScale.invert(
+                    commitProgress
+                );
+
+
+            applyTimeFilter(
+                commitMaxTime,
+                {
+                    syncSlider: false,
+                }
+            );
+        }
+    );
+}
+
+
+// ==================================================
+// LAB 8 — STORY TEXT
+// ==================================================
+
+function renderStory() {
+    const story =
+        d3.select(
+            '#scatter-story'
+        );
+
+
+    if (
+        story.empty()
+    ) {
+        return;
+    }
+
+
+    story
+        .selectAll(
+            '.step'
+        )
+        .data(
+            commits,
+            (d) => d.id
+        )
+        .join(
+            'div'
+        )
+        .attr(
+            'class',
+            'step'
+        )
+        .html(
+            (commit, index) => {
+                const fileCount =
+                    new Set(
+                        commit.lines.map(
+                            (line) =>
+                                line.file
+                        )
+                    ).size;
+
+
+                return `
+                    <p>
+                        <strong>
+                            ${
+                                commit.datetime
+                                    .toLocaleString(
+                                        'en-US',
+                                        {
+                                            dateStyle:
+                                                'full',
+                                            timeStyle:
+                                                'short',
+                                        }
+                                    )
+                            }
+                        </strong>
+                    </p>
+
+                    <p>
+                        ${
+                            index === 0
+                                ? 'This is the first commit represented in the current codebase.'
+                                : 'Another commit moves the portfolio forward.'
+                        }
+                    </p>
+
+                    <p>
+                        This commit edited
+                        <strong>
+                            ${commit.totalLines}
+                        </strong>
+                        lines across
+                        <strong>
+                            ${fileCount}
+                        </strong>
+                        ${
+                            fileCount === 1
+                                ? 'file'
+                                : 'files'
+                        }.
+                    </p>
+
+                    <p>
+                        <a
+                            href="${commit.url}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            View this commit on GitHub
+                        </a>
+                    </p>
+                `;
+            }
+        );
+}
+
+
+// ==================================================
+// LAB 8 — SCROLLYTELLING
+// ==================================================
+
+function onStepEnter(
+    response
+) {
+    const commit =
+        response.element
+            .__data__;
+
+
+    if (!commit) {
+        return;
+    }
+
+
+    d3.selectAll(
+        '#scatter-story .step'
+    )
+        .classed(
+            'is-active',
+            false
+        );
+
+
+    d3.select(
+        response.element
+    )
+        .classed(
+            'is-active',
+            true
+        );
+
+
+    applyTimeFilter(
+        commit.datetime
+    );
+}
+
+
+function setupScrollytelling() {
+    const container =
+        document.getElementById(
+            'scrolly-1'
+        );
+
+
+    const firstStep =
+        document.querySelector(
+            '#scatter-story .step'
+        );
+
+
+    if (
+        !container ||
+        !firstStep
+    ) {
+        return;
+    }
+
+
+    scroller =
+        scrollama();
+
+
+    scroller
+        .setup({
+            container:
+                '#scrolly-1',
+
+            step:
+                '#scrolly-1 .step',
+
+            offset:
+                0.5,
+        })
+        .onStepEnter(
+            onStepEnter
+        );
+
+
+    window.addEventListener(
+        'resize',
+        () => {
+            scroller.resize();
+        }
+    );
+}
+
+
+// ==================================================
+// INITIALIZE
+// ==================================================
+
+async function init() {
+    data =
+        await loadData();
+
+
+    commits =
+        processCommits(
+            data
+        );
+
+
+    if (
+        commits.length === 0
+    ) {
+        console.warn(
+            'No commit data found.'
+        );
+
+        return;
+    }
+
+
+    // ----------------------------------------------
+    // Lab 8 time scale
+    // ----------------------------------------------
+
+    timeScale =
+        d3.scaleTime()
+            .domain(
+                d3.extent(
+                    commits,
+                    (d) =>
+                        d.datetime
+                )
+            )
+            .range([
+                0,
+                100,
+            ]);
+
+
+    commitProgress =
+        100;
+
+
+    commitMaxTime =
+        timeScale.invert(
+            commitProgress
+        );
+
+
+    // ----------------------------------------------
+    // Original Lab 6 content
+    // ----------------------------------------------
+
+    renderCommitInfo(
+        data,
+        commits
+    );
+
+
+    renderScatterPlot(
+        commits
+    );
+
+
+    // ----------------------------------------------
+    // Lab 8
+    // ----------------------------------------------
+
+    updateFileDisplay(
+        commits
+    );
+
+
+    updateCommitTimeLabel();
+
+
+    setupSlider();
+
+
+    renderStory();
+
+
+    setupScrollytelling();
+}
+
+
+await init();

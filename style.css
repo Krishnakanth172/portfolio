@@ -991,3 +991,237 @@ dl.info[hidden]:not(
     }
 
 }
+
+/* =========================================================
+   LAB 8 — ANIMATION
+   ========================================================= */
+
+.commit-filter {
+  margin-block: 1rem 2rem;
+}
+
+.commit-filter label {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  width: 100%;
+}
+
+#commit-progress {
+  flex: 1;
+}
+
+#commit-time {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+#chart circle {
+  transition:
+    cx 200ms ease,
+    cy 200ms ease,
+    r 200ms ease,
+    fill-opacity 200ms ease;
+}
+
+@starting-style {
+  #chart circle {
+    r: 0;
+  }
+}
+
+/* =========================================================
+   LAB 8 — SCROLLYTELLING FINAL LAYOUT
+   ========================================================= */
+
+#scrolly-1 {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(240px, 0.8fr) minmax(500px, 1.6fr);
+    gap: 2rem;
+    align-items: start;
+    width: 100%;
+}
+
+#scatter-story {
+    grid-column: 1;
+    min-width: 0;
+}
+
+#scatter-plot {
+    grid-column: 2;
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+    min-width: 0;
+}
+
+#scatter-plot #chart {
+    width: 100%;
+}
+
+#scatter-plot svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+#scatter-story .step {
+    min-height: 70vh;
+    padding: 1rem 0 4rem;
+    opacity: 0.35;
+    transition: opacity 200ms ease;
+}
+
+#scatter-story .step.is-active {
+    opacity: 1;
+}
+
+#scatter-story .step p {
+    max-width: 38ch;
+}
+
+
+/* =========================================================
+   LAB 8 — TIME FILTER
+   ========================================================= */
+
+.commit-filter {
+    margin-block: 1.25rem 2rem;
+}
+
+.commit-filter label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+#commit-progress {
+    flex: 1;
+    min-width: 160px;
+}
+
+#commit-max-time {
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   LAB 8 — ANIMATED DOTS
+   ========================================================= */
+
+#chart circle {
+    transition:
+        cx 200ms ease,
+        cy 200ms ease,
+        r 200ms ease,
+        fill-opacity 200ms ease;
+}
+
+@starting-style {
+    #chart circle {
+        r: 0;
+    }
+}
+
+
+/* =========================================================
+   LAB 8 — FILE UNIT VISUALIZATION
+   ========================================================= */
+
+.file-evolution {
+    margin-top: 4rem;
+}
+
+#files {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) 3fr;
+    gap: 0.75rem 1rem;
+}
+
+#files > .file-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    padding-block: 0.75rem;
+    border-bottom: 1px solid color-mix(
+        in oklch,
+        currentColor 15%,
+        transparent
+    );
+}
+
+#files dt {
+    grid-column: 1;
+}
+
+#files dt code {
+    overflow-wrap: anywhere;
+}
+
+#files dt small {
+    display: block;
+    margin-top: 0.25rem;
+    opacity: 0.6;
+}
+
+#files dd {
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 0.16em;
+    margin: 0;
+    padding-top: 0.3em;
+}
+
+.loc {
+    display: block;
+    width: 0.5em;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--color, steelblue);
+}
+
+
+/* =========================================================
+   LAB 8 — RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 850px) {
+
+    #scrolly-1 {
+        grid-template-columns: 1fr;
+    }
+
+    #scatter-story,
+    #scatter-plot {
+        grid-column: 1;
+    }
+
+    #scatter-plot {
+        position: relative;
+        top: auto;
+    }
+
+    #scatter-story .step {
+        min-height: auto;
+        padding-bottom: 3rem;
+    }
+
+    #files {
+        grid-template-columns: 1fr;
+    }
+
+    #files > .file-row {
+        grid-template-columns: 1fr;
+    }
+
+    #files dt,
+    #files dd {
+        grid-column: 1;
+    }
+}
